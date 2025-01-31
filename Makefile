@@ -1,5 +1,10 @@
-default:
-	avr-gcc -Os -DF_CPU=16000000UL -mmcu=atmega328p -c -o uart.o uart.c
-	avr-gcc -o uart.bin uart.o
-	avr-objcopy -O ihex -R .eeprom uart.bin uart.hex
-	sudo avrdude -F -V -c arduino -p ATMEGA328P -P /dev/ttyACM0 -b 115200 -U flash:w:uart.hex
+# Target: Upload the program
+upload:
+	avr-gcc -mmcu=atmega328p -Os -Wall -fno-strict-aliasing -c uart.c
+	avr-gcc -mmcu=atmega328p -Os -Wall -fno-strict-aliasing uart.o -o uart.elf
+	avr-objcopy -j .text -j .data -O ihex uart.elf uart.hex
+	avrdude -p atmega328p -c arduino -P /dev/ttyACM0 -b 115200 -D -U flash:w:uart.hex:i
+
+# Clean the project
+clean:
+	rm -f *.o *.elf *.hex
